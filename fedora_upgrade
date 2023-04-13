@@ -1,0 +1,34 @@
+#!/bin/bash
+
+source /etc/os-release
+MIRROR="https://mirror.xenyth.net/fedora/linux/releases"
+
+main () {
+	curl -s -o /dev/null $MIRROR
+
+	if [[ $? != 0 ]]; then
+		echo "Internet connection not found, or mirror is offline. Trying again in 60 seconds.."
+		sleep 60
+		main
+		return
+	fi
+
+	local version_next=$(($VERSION_ID + 1))
+	local mirror_response=$(curl -s -o /dev/null -w "%{http_code}" $MIRROR/$version_next/)
+
+	if [[ $mirror_response == 404 ]]; then
+		echo "Fedora $VERSION_ID is the latest version."
+		return
+	fi
+
+	dnf upgrade --refresh -y
+	dnf system-upgrade download --releasever=$version_next -y
+
+	wall "WARNING: An upgrade from Fedora $VERSION_ID to Fedora $version_next is commencing! Your computer will reboot in 60 seconds."
+
+	sleep 60
+
+	dnf system-upgrade reboot -y
+}
+
+main
