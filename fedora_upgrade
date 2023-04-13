@@ -16,12 +16,17 @@ check () {
 
 	local mirror_response=$(curl -s -o /dev/null -w "%{http_code}" $MIRROR/$VERSION_NEXT/)
 
-	if [[ $mirror_response == 404 ]]; then
-		echo "Fedora $VERSION_ID is the latest version."
-		return
-	fi
-
-	upgrade
+	case $mirror_response in
+			404)
+				echo "Fedora $VERSION_ID is the latest version."
+				;;
+			200)
+				upgrade
+				;;
+			*)
+				echo "Mirror returned unhandled HTTP Response Code: $mirror_response."
+				;;
+	esac
 }
 
 upgrade () {
