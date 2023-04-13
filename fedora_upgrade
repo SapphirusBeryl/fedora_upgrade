@@ -2,6 +2,7 @@
 
 source /etc/os-release
 MIRROR="https://mirror.xenyth.net/fedora/linux/releases"
+VERSION_NEXT=$(($VERSION_ID + 1))
 
 main () {
 	curl -s -o /dev/null $MIRROR
@@ -13,7 +14,6 @@ main () {
 		return
 	fi
 
-	local version_next=$(($VERSION_ID + 1))
 	local mirror_response=$(curl -s -o /dev/null -w "%{http_code}" $MIRROR/$version_next/)
 
 	if [[ $mirror_response == 404 ]]; then
@@ -22,9 +22,9 @@ main () {
 	fi
 
 	dnf upgrade --refresh -y
-	dnf system-upgrade download --releasever=$version_next -y
+	dnf system-upgrade download --releasever=$VERSION_NEXT -y
 
-	wall "WARNING: An upgrade from Fedora $VERSION_ID to Fedora $version_next is commencing! Your computer will reboot in 60 seconds."
+	wall "WARNING: An upgrade from Fedora $VERSION_ID to Fedora $VERSION_NEXT is commencing! Your computer will reboot in 60 seconds."
 
 	sleep 60
 
