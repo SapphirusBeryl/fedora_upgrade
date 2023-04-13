@@ -4,13 +4,13 @@ source /etc/os-release
 MIRROR="https://mirror.xenyth.net/fedora/linux/releases"
 VERSION_NEXT=$(($VERSION_ID + 1))
 
-main () {
+check () {
 	curl -s -o /dev/null $MIRROR
 
 	if [[ $? != 0 ]]; then
 		echo "Internet connection not found, or mirror is offline. Trying again in 60 seconds.."
 		sleep 60
-		main
+		check
 		return
 	fi
 
@@ -21,6 +21,10 @@ main () {
 		return
 	fi
 
+	upgrade
+}
+
+upgrade () {
 	dnf upgrade --refresh -y
 	dnf system-upgrade download --releasever=$VERSION_NEXT -y
 
@@ -31,4 +35,4 @@ main () {
 	dnf system-upgrade reboot -y
 }
 
-main
+check
