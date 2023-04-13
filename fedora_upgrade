@@ -8,7 +8,7 @@ check () {
 	curl -s -o /dev/null $MIRROR
 
 	if [[ $? != 0 ]]; then
-		echo "Internet connection not found, or mirror is offline. Trying again in 60 seconds.."
+		echo "Internet connection, or mirror, is offline. Trying again in 60 seconds.."
 		sleep 60
 		check
 		return
