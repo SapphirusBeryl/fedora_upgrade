@@ -1,3 +1,3 @@
-# fedora_release
+# Fedora Release Upgrade script
 
-Fedora Release Upgrade script
+Automatically updates Fedora to the next major available release.
