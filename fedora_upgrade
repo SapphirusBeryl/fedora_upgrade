@@ -14,7 +14,7 @@ check () {
 		return
 	fi
 
-	local mirror_response=$(curl -s -o /dev/null -w "%{http_code}" $MIRROR/$version_next/)
+	local mirror_response=$(curl -s -o /dev/null -w "%{http_code}" $MIRROR/$VERSION_NEXT/)
 
 	if [[ $mirror_response == 404 ]]; then
 		echo "Fedora $VERSION_ID is the latest version."
