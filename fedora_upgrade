@@ -3,14 +3,19 @@
 source /etc/os-release
 MIRROR="https://mirror.xenyth.net/fedora/linux/releases"
 VERSION_NEXT=$(($VERSION_ID + 1))
+STATUS_FILE=/var/cache/dnf/upgrade.release
+SLEEP=30
 
 check () {
+	if [[ -f $STATUS_FILE ]]; then
+			upgrade
+			return
+	fi
+	
 	curl -s -o /dev/null $MIRROR
 
 	if [[ $? != 0 ]]; then
-		echo "Internet connection, or mirror, is offline. Trying again in 60 seconds.."
-		sleep 60
-		check
+		timeout
 		return
 	fi
 
@@ -24,20 +29,31 @@ check () {
 				upgrade
 				;;
 			*)
-				echo "Mirror returned unhandled HTTP Response Code: $mirror_response."
+				echo "Mirror returned unhandled HTTP response: $mirror_response."
 				;;
 	esac
 }
 
+download () {
+		dnf upgrade --refresh -y
+		dnf system-upgrade download --releasever=$VERSION_NEXT -y
+		[[ $? == 0 ]] && touch $STATUS_FILE
+}
+
 upgrade () {
-	dnf upgrade --refresh -y
-	dnf system-upgrade download --releasever=$VERSION_NEXT -y
+		rm $STATUS_FILE
+		dnf system-upgrade reboot -y
+}
 
-	wall "WARNING: An upgrade from Fedora $VERSION_ID to Fedora $VERSION_NEXT is commencing! Your computer will reboot in 60 seconds."
-
-	sleep 60
-
-	dnf system-upgrade reboot -y
+timeout () {
+		if [[ $SLEEP -gt 3840 ]]; then
+			echo "Upgrade check has timed out. Aborting operation."
+			exit 1
+		fi
+		echo "Internet connection, or mirror, is offline. Sleeping for $SLEEP seconds.."
+		sleep $SLEEP
+		SLEEP=$(($SLEEP*2))
+		check
 }
 
 check
