@@ -26,7 +26,7 @@ check () {
 				echo "Fedora $VERSION_ID is the latest version."
 				;;
 			200)
-				upgrade
+				download
 				;;
 			*)
 				echo "Mirror returned unhandled HTTP response: $mirror_response."
