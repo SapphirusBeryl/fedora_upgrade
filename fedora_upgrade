@@ -8,8 +8,8 @@ SLEEP=30
 
 check () {
 	if [[ -f $STATUS_FILE ]]; then
-			upgrade
-			return
+		upgrade
+		return
 	fi
 	
 	curl -s -o /dev/null $MIRROR
